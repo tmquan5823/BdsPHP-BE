@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PropertyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,9 @@ use App\Http\Controllers\Api\AuthController;
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/signin', [AuthController::class, 'signin']);
+
+// Property routes (public for testing)
+Route::get('/properties', [PropertyController::class, 'getPropertyList']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {

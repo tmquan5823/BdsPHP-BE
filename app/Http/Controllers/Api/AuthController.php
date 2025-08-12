@@ -49,6 +49,7 @@ class AuthController extends Controller
 
         try {
             $result = $this->authService->login($validator->validated());
+
             return $this->response('success', 'Đăng nhập thành công', 200, $result);
         } catch (\App\Exceptions\Auth\AuthenticationException $e) {
             return $this->response('error', $e->getMessage(), $e->getCode());
@@ -75,6 +76,7 @@ class AuthController extends Controller
 
         try {
             $result = $this->authService->signin($validator->validated());
+
             return $this->response('success', 'Đăng ký thành công', 201, $result);
         } catch (\Exception $e) {
             return $this->response('error', 'Đăng ký thất bại', 500, ['message' => $e->getMessage()]);
@@ -88,6 +90,7 @@ class AuthController extends Controller
     {
         try {
             $result = $this->authService->logout($request->user());
+
             return $this->response('success', 'Đăng xuất thành công', 200, $result);
         } catch (\Exception $e) {
             return $this->response('error', 'Đăng xuất thất bại', 500, ['message' => $e->getMessage()]);
@@ -105,6 +108,7 @@ class AuthController extends Controller
                 'name' => $request->user()->name,
                 'email' => $request->user()->email,
             ];
+
             return $this->response('success', 'Lấy thông tin thành công', 200, ['user' => $userData]);
         } catch (\Exception $e) {
             return $this->response('error', 'Không thể lấy thông tin người dùng', 500, ['message' => $e->getMessage()]);
@@ -123,6 +127,7 @@ class AuthController extends Controller
             ]);
 
             $users = app(\App\Repositories\AuthRepository::class)->getUserList($request);
+
             return $this->response('success', 'Lấy danh sách thành công', 200, $users);
         } catch (\Exception $e) {
             return $this->response('error', 'Không thể lấy danh sách người dùng', 500, ['message' => $e->getMessage()]);
@@ -135,13 +140,13 @@ class AuthController extends Controller
     public function getUserDetail($id)
     {
         try {
-            if (!is_numeric($id) || $id <= 0) {
+            if (! is_numeric($id) || $id <= 0) {
                 return $this->response('error', 'ID không hợp lệ', 422);
             }
 
             $user = app(\App\Repositories\AuthRepository::class)->getUserDetail($id);
 
-            if (!$user) {
+            if (! $user) {
                 return $this->response('error', 'Không tìm thấy người dùng', 404);
             }
 
@@ -157,7 +162,7 @@ class AuthController extends Controller
     public function updateUser(Request $request, $id)
     {
         try {
-            if (!is_numeric($id) || $id <= 0) {
+            if (! is_numeric($id) || $id <= 0) {
                 return $this->response('error', 'ID không hợp lệ', 422);
             }
 
@@ -169,7 +174,7 @@ class AuthController extends Controller
 
             $success = app(\App\Repositories\AuthRepository::class)->updateUser($id, $validated);
 
-            if (!$success) {
+            if (! $success) {
                 return $this->response('error', 'Cập nhật thất bại', 400);
             }
 
@@ -185,13 +190,13 @@ class AuthController extends Controller
     public function deleteUser($id)
     {
         try {
-            if (!is_numeric($id) || $id <= 0) {
+            if (! is_numeric($id) || $id <= 0) {
                 return $this->response('error', 'ID không hợp lệ', 422);
             }
 
             $success = app(\App\Repositories\AuthRepository::class)->deleteUser($id);
 
-            if (!$success) {
+            if (! $success) {
                 return $this->response('error', 'Xóa thất bại', 400);
             }
 

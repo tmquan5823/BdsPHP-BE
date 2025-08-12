@@ -65,6 +65,7 @@ abstract class BaseRepository
         if ($record) {
             return $record->update($data);
         }
+
         return false;
     }
 
@@ -80,6 +81,7 @@ abstract class BaseRepository
         if ($record) {
             return $record->delete();
         }
+
         return false;
     }
 }

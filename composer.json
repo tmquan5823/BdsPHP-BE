@@ -56,6 +56,21 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "psr12": [
+            "./vendor/bin/pint"
+        ],
+        "psr12:check": [
+            "./vendor/bin/pint --test"
+        ],
+        "psr12:fix": [
+            "./vendor/bin/pint"
+        ],
+        "psr12:fix-diff": [
+            "./vendor/bin/pint --diff"
+        ],
+        "psr12:fix-verbose": [
+            "./vendor/bin/pint -v"
         ]
     },
     "extra": {

@@ -47,7 +47,7 @@ class ValidationException extends Exception
             'error' => 'Validation Failed',
             'message' => $this->getMessage(),
             'errors' => $this->getErrors(),
-            'code' => $this->getCode()
+            'code' => $this->getCode(),
         ], $this->getCode());
     }
 }

@@ -1,61 +1,262 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏠 BDS PHP Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Backend API cho hệ thống quản lý bất động sản được xây dựng bằng Laravel 12.
 
-## About Laravel
+## 🚀 Yêu cầu hệ thống
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   **PHP**: ^8.2
+-   **Composer**: ^2.0
+-   **Database**: MySQL/PostgreSQL/SQLite
+-   **Node.js**: ^18.0 (cho frontend assets)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📦 Cài đặt
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Clone repository
 
-## Learning Laravel
+```bash
+git clone <repository-url>
+cd BdsPHP-BE
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 2. Cài đặt dependencies
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+composer install
+npm install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Cấu hình môi trường
 
-## Laravel Sponsors
+```bash
+# Copy file môi trường
+cp .env.example .env
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Tạo application key
+php artisan key:generate
+```
 
-### Premium Partners
+### 4. Cấu hình database trong .env
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bds_php
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Contributing
+### 5. Chạy migration và seeder
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+# Tạo database tables
+php artisan migrate
 
-## Code of Conduct
+# Chạy seeder để tạo dữ liệu mẫu
+php artisan db:seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🏃‍♂️ Chạy ứng dụng
 
-## Security Vulnerabilities
+### Development server
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+# Chạy Laravel server
+php artisan serve
 
-## License
+# Chạy Vite dev server (trong terminal khác)
+npm run dev
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Hoặc chạy cả hai cùng lúc
+composer dev
+```
+
+### Production build
+
+```bash
+# Build assets cho production
+npm run build
+```
+
+## 🧪 Testing
+
+```bash
+# Chạy tests
+composer test
+
+# Hoặc
+php artisan test
+```
+
+## 🎨 Code Style (PSR-12)
+
+### Kiểm tra code style
+
+```bash
+# Kiểm tra xem có vi phạm PSR-12 không
+composer psr12:check
+```
+
+### Tự động sửa code style
+
+```bash
+# Sửa tất cả files
+composer psr12:fix
+
+# Sửa và xem diff
+composer psr12:fix-diff
+
+# Sửa với verbose output
+composer psr12:fix-verbose
+```
+
+## 📚 API Endpoints
+
+### Authentication
+
+```
+POST   /api/login          - Đăng nhập
+POST   /api/signin         - Đăng ký
+POST   /api/logout         - Đăng xuất (cần auth)
+GET    /api/me             - Thông tin user (cần auth)
+```
+
+### Properties (Bất động sản)
+
+```
+GET    /api/properties     - Danh sách bất động sản
+```
+
+### User Management (cần auth)
+
+```
+GET    /api/users          - Danh sách users
+GET    /api/users/{id}     - Chi tiết user
+PUT    /api/users/{id}     - Cập nhật user
+DELETE /api/users/{id}     - Xóa user
+```
+
+## 🔍 API Properties - Filter & Pagination
+
+### Parameters
+
+-   `per_page`: Số items/trang (1-100, mặc định: 10)
+-   `city`: Thành phố
+-   `status`: Trạng thái (available, sold, rented, pending)
+-   `property_type`: Loại BDS (apartment, house, villa, office, land)
+-   `min_price`: Giá tối thiểu
+-   `max_price`: Giá tối đa
+
+### Ví dụ sử dụng
+
+```bash
+# Lấy 20 căn hộ có sẵn ở Hồ Chí Minh
+GET /api/properties?property_type=apartment&status=available&city=Hồ Chí Minh&per_page=20
+
+# Lấy nhà riêng giá từ 1-5 tỷ
+GET /api/properties?property_type=house&min_price=1000000000&max_price=5000000000
+```
+
+### Response format
+
+```json
+{
+    "status": "success",
+    "message": "Lấy danh sách bất động sản thành công",
+    "code": 200,
+    "data": {
+        "data": [
+            {
+                "id": 1,
+                "title": "Căn hộ Quận 1",
+                "price": 1500000000,
+                "city": "Hồ Chí Minh",
+                "status": "available",
+                "images": [
+                    {
+                        "id": 1,
+                        "image_path": "/storage/properties/1.jpg",
+                        "is_primary": true
+                    }
+                ]
+            }
+        ],
+        "meta": {
+            "current_page": 1,
+            "last_page": 5,
+            "total": 45
+        }
+    }
+}
+```
+
+## 🏗️ Cấu trúc Project
+
+```
+BdsPHP-BE/
+├── app/
+│   ├── Exceptions/          # Custom exceptions
+│   ├── Http/
+│   │   ├── Controllers/     # API Controllers
+│   │   ├── Middlewares/     # HTTP Middlewares
+│   │   └── Validations/     # Request validations
+│   ├── Models/              # Eloquent models
+│   ├── Providers/           # Service providers
+│   ├── Repositories/        # Data access layer
+│   └── Services/            # Business logic layer
+├── database/
+│   ├── migrations/          # Database migrations
+│   ├── seeders/             # Database seeders
+│   └── factories/           # Model factories
+├── routes/
+│   └── api.php              # API routes
+└── tests/                   # Test files
+```
+
+## 🔧 Troubleshooting
+
+### Lỗi thường gặp
+
+1. **"Class not found"**
+
+    ```bash
+    composer dump-autoload
+    ```
+
+2. **"Route not defined"**
+
+    ```bash
+    php artisan route:clear
+    php artisan config:clear
+    ```
+
+3. **Database connection error**
+
+    - Kiểm tra cấu hình trong `.env`
+    - Đảm bảo database đã được tạo
+    - Chạy `php artisan migrate:status`
+
+4. **Permission denied**
+    ```bash
+    chmod -R 755 storage bootstrap/cache
+    ```
+
+## 📝 Contributing
+
+1. Fork project
+2. Tạo feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Tạo Pull Request
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## 📞 Support
+
+Nếu có vấn đề gì, vui lòng tạo issue hoặc liên hệ team development.
+
+---
+
+**Happy Coding! 🎉**

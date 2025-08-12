@@ -33,7 +33,7 @@ class UserNotFoundException extends Exception
         return response()->json([
             'error' => 'User Not Found',
             'message' => $this->getMessage(),
-            'code' => $this->getCode()
+            'code' => $this->getCode(),
         ], $this->getCode());
     }
 }

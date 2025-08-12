@@ -4,8 +4,6 @@ namespace App\Services;
 
 use App\Exceptions\Auth\AuthenticationException;
 use App\Repositories\AuthRepository;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
@@ -29,7 +27,7 @@ class AuthService
             // Validate authentication
             $user = $this->authRepository->authenticateUser($credentials['email'], $credentials['password']);
 
-            if (!$user) {
+            if (! $user) {
                 throw new AuthenticationException('Thông tin đăng nhập không chính xác.');
             }
 
@@ -68,7 +66,7 @@ class AuthService
             return [
                 'token' => $token,
                 'user' => $this->authRepository->getUserLoginData($user),
-                'message' => 'Đăng ký thành công'
+                'message' => 'Đăng ký thành công',
             ];
         } catch (\Exception $e) {
             throw new \Exception('Đăng ký thất bại: ' . $e->getMessage());
@@ -88,14 +86,14 @@ class AuthService
             $this->authRepository->revokeUserToken($user);
 
             return [
-                'message' => 'Đăng xuất thành công'
+                'message' => 'Đăng xuất thành công',
             ];
         } catch (\Exception $e) {
             // Log error but don't expose it to user
             \Log::error('Logout error: ' . $e->getMessage());
 
             return [
-                'message' => 'Đăng xuất thành công'
+                'message' => 'Đăng xuất thành công',
             ];
         }
     }

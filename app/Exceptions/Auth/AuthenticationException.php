@@ -14,7 +14,7 @@ class AuthenticationException extends Exception
         if (empty($message)) {
             $message = $this->message;
         }
-        
+
         if ($code === 0) {
             $code = $this->code;
         }
@@ -33,7 +33,7 @@ class AuthenticationException extends Exception
         return response()->json([
             'error' => 'Authentication Failed',
             'message' => $this->getMessage(),
-            'code' => $this->getCode()
+            'code' => $this->getCode(),
         ], $this->getCode());
     }
 }

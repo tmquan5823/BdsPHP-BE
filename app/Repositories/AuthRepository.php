@@ -3,11 +3,10 @@
 namespace App\Repositories;
 
 use App\Models\User;
-use App\Repositories\BaseRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class AuthRepository extends BaseRepository implements AuthRepositoryInterface
+class AuthRepository extends BaseRepository
 {
     /**
      * Get the model for the repository

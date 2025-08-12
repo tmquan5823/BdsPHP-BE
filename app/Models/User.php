@@ -9,7 +9,9 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -58,5 +60,21 @@ class User extends Authenticatable
             'name' => $this->name,
             'email' => $this->email,
         ];
+    }
+
+    /**
+     * Get the properties created by this user
+     */
+    public function properties()
+    {
+        return $this->hasMany(Property::class, 'created_by');
+    }
+
+    /**
+     * Get the properties updated by this user
+     */
+    public function updatedProperties()
+    {
+        return $this->hasMany(Property::class, 'updated_by');
     }
 }
