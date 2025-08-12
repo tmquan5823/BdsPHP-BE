@@ -3,191 +3,201 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\AuthRepository;
+use App\Http\Validations\AuthValidation;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    protected $authRepository;
+    protected $authService;
+    protected $authValidation;
 
-    public function __construct(AuthRepository $authRepository)
+    public function __construct(AuthService $authService, AuthValidation $authValidation)
     {
-        $this->authRepository = $authRepository;
+        $this->authService = $authService;
+        $this->authValidation = $authValidation;
+    }
+
+    /**
+     * Helper method để tạo response format nhất quán
+     */
+    private function response($status, $message, $code, $data = null)
+    {
+        return response()->json([
+            'status' => $status,
+            'message' => $message,
+            'code' => $code,
+            'data' => $data,
+        ], $code);
     }
 
     /**
      * User login
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $validator = $this->authValidation->validateLogin($request);
 
-        $user = $this->authRepository->authenticateUser($request->email, $request->password);
-
-        if (!$user) {
-            throw ValidationException::withMessages([
-                'email' => ['Thông tin đăng nhập không chính xác.'],
-            ]);
+        if ($validator->fails()) {
+            return $this->response(
+                'error',
+                'Dữ liệu không hợp lệ',
+                422,
+                ['errors' => $validator->errors()]
+            );
         }
 
-        // Tạo token
-        $token = $this->authRepository->createUserToken($user);
-
-        return response()->json([
-            'token' => $token,
-            'user' => $this->authRepository->getUserLoginData($user),
-        ]);
+        try {
+            $result = $this->authService->login($validator->validated());
+            return $this->response('success', 'Đăng nhập thành công', 200, $result);
+        } catch (\App\Exceptions\Auth\AuthenticationException $e) {
+            return $this->response('error', $e->getMessage(), $e->getCode());
+        } catch (\Exception $e) {
+            return $this->response('error', 'Đăng nhập thất bại', 500, ['message' => $e->getMessage()]);
+        }
     }
 
     /**
      * User signin (register)
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function signin(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-        ]);
+        $validator = $this->authValidation->validateSignin($request);
 
-        $userData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-        ];
+        if ($validator->fails()) {
+            return $this->response(
+                'error',
+                'Dữ liệu không hợp lệ',
+                422,
+                ['errors' => $validator->errors()]
+            );
+        }
 
-        $user = $this->authRepository->createUser($userData);
-
-        // Tạo token
-        $token = $this->authRepository->createUserToken($user);
-
-        return response()->json([
-            'token' => $token,
-            'user' => $this->authRepository->getUserLoginData($user),
-            'message' => 'Đăng ký thành công'
-        ], 201);
+        try {
+            $result = $this->authService->signin($validator->validated());
+            return $this->response('success', 'Đăng ký thành công', 201, $result);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Đăng ký thất bại', 500, ['message' => $e->getMessage()]);
+        }
     }
 
     /**
      * User logout
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function logout(Request $request)
     {
-        $this->authRepository->revokeUserToken($request->user());
-
-        return response()->json([
-            'message' => 'Đăng xuất thành công'
-        ]);
+        try {
+            $result = $this->authService->logout($request->user());
+            return $this->response('success', 'Đăng xuất thành công', 200, $result);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Đăng xuất thất bại', 500, ['message' => $e->getMessage()]);
+        }
     }
 
     /**
      * Get authenticated user info
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function me(Request $request)
     {
-        return response()->json([
-            'user' => $this->authRepository->getUserLoginData($request->user()),
-        ]);
+        try {
+            $userData = [
+                'id' => $request->user()->id,
+                'name' => $request->user()->name,
+                'email' => $request->user()->email,
+            ];
+            return $this->response('success', 'Lấy thông tin thành công', 200, ['user' => $userData]);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Không thể lấy thông tin người dùng', 500, ['message' => $e->getMessage()]);
+        }
     }
 
     /**
-     * Get user list (admin function)
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Get user list
      */
     public function getUserList(Request $request)
     {
-        $users = $this->authRepository->getUserList($request);
+        try {
+            $validated = $request->validate([
+                'per_page' => 'sometimes|integer|min:1|max:100',
+                'search' => 'sometimes|string|max:255',
+            ]);
 
-        return response()->json($users);
+            $users = app(\App\Repositories\AuthRepository::class)->getUserList($request);
+            return $this->response('success', 'Lấy danh sách thành công', 200, $users);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Không thể lấy danh sách người dùng', 500, ['message' => $e->getMessage()]);
+        }
     }
 
     /**
      * Get user detail
-     *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
      */
     public function getUserDetail($id)
     {
-        $user = $this->authRepository->getUserDetail($id);
+        try {
+            if (!is_numeric($id) || $id <= 0) {
+                return $this->response('error', 'ID không hợp lệ', 422);
+            }
 
-        if (!$user) {
-            return response()->json([
-                'message' => 'Không tìm thấy người dùng'
-            ], 404);
+            $user = app(\App\Repositories\AuthRepository::class)->getUserDetail($id);
+
+            if (!$user) {
+                return $this->response('error', 'Không tìm thấy người dùng', 404);
+            }
+
+            return $this->response('success', 'Lấy thông tin thành công', 200, ['user' => $user]);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Không thể lấy thông tin người dùng', 500, ['message' => $e->getMessage()]);
         }
-
-        return response()->json([
-            'user' => $user
-        ]);
     }
 
     /**
      * Update user
-     *
-     * @param Request $request
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
      */
     public function updateUser(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $id,
-            'password' => 'sometimes|string|min:6',
-        ]);
+        try {
+            if (!is_numeric($id) || $id <= 0) {
+                return $this->response('error', 'ID không hợp lệ', 422);
+            }
 
-        $userData = $request->only(['name', 'email', 'password']);
+            $validated = $request->validate([
+                'name' => 'sometimes|string|max:255',
+                'email' => 'sometimes|email|unique:users,email,' . $id,
+                'password' => 'sometimes|string|min:6',
+            ]);
 
-        $success = $this->authRepository->updateUser($id, $userData);
+            $success = app(\App\Repositories\AuthRepository::class)->updateUser($id, $validated);
 
-        if (!$success) {
-            return response()->json([
-                'message' => 'Cập nhật thất bại'
-            ], 400);
+            if (!$success) {
+                return $this->response('error', 'Cập nhật thất bại', 400);
+            }
+
+            return $this->response('success', 'Cập nhật thành công', 200);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Cập nhật thất bại', 500, ['message' => $e->getMessage()]);
         }
-
-        return response()->json([
-            'message' => 'Cập nhật thành công'
-        ]);
     }
 
     /**
      * Delete user
-     *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
      */
     public function deleteUser($id)
     {
-        $success = $this->authRepository->deleteUser($id);
+        try {
+            if (!is_numeric($id) || $id <= 0) {
+                return $this->response('error', 'ID không hợp lệ', 422);
+            }
 
-        if (!$success) {
-            return response()->json([
-                'message' => 'Xóa thất bại'
-            ], 400);
+            $success = app(\App\Repositories\AuthRepository::class)->deleteUser($id);
+
+            if (!$success) {
+                return $this->response('error', 'Xóa thất bại', 400);
+            }
+
+            return $this->response('success', 'Xóa thành công', 200);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Xóa thất bại', 500, ['message' => $e->getMessage()]);
         }
-
-        return response()->json([
-            'message' => 'Xóa thành công'
-        ]);
     }
 }
