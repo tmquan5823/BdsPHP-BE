@@ -174,7 +174,21 @@ class AuthRepository extends BaseRepository
      */
     public function revokeUserToken($user): bool
     {
-        return $user->currentAccessToken()->delete();
+        if (! $user) {
+            return false;
+        }
+
+        try {
+            if (method_exists($user, 'currentAccessToken') && $user->currentAccessToken()) {
+                return $user->currentAccessToken()->delete();
+            }
+
+            return true; // No token to revoke
+        } catch (\Exception $e) {
+            \Log::error('Error revoking user token: ' . $e->getMessage());
+
+            return false;
+        }
     }
 
     /**

@@ -60,4 +60,25 @@ class PropertyService
             throw new \Exception('Không thể lấy chi tiết bất động sản: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Create new property
+     *
+     * @param array $data
+     * @return object
+     */
+    public function createProperty(array $data): object
+    {
+        try {
+            // Create property via repository
+            $result = $this->propertyRepository->createProperty($data);
+
+            return $result;
+        } catch (\Exception $e) {
+            // Log error for debugging
+            \Log::error('Property creation error: ' . $e->getMessage());
+
+            throw new \Exception('Không thể tạo bất động sản: ' . $e->getMessage());
+        }
+    }
 }

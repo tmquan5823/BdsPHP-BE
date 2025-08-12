@@ -195,4 +195,105 @@ class PropertyRepository extends BaseRepository
 
         return (object) $formattedProperty;
     }
+
+    /**
+     * Create new property with images
+     * @param array $data
+     * @return object
+     */
+    public function createProperty(array $data): object
+    {
+        $images = $data['images'] ?? [];
+        unset($data['images']);
+
+        $property = Property::create($data);
+
+        if (! empty($images)) {
+            foreach ($images as $index => $uploadedFile) {
+                // Generate unique filename
+                $filename = time() . '_' . $index . '.' . $uploadedFile->getClientOriginalExtension();
+
+                // Store file in storage/app/public/properties
+                $path = $uploadedFile->storeAs('properties', $filename, 'public');
+
+                // Create image record
+                $property->images()->create([
+                    'image_path' => '/storage/' . $path,
+                    'image_name' => $uploadedFile->getClientOriginalName(),
+                    'is_primary' => ($index === 0), // First image is primary
+                    'sort_order' => ($index + 1),
+                ]);
+            }
+        }
+
+        $property->load('images');
+
+        return $property;
+    }
+
+    /**
+     * Update property with images
+     * @param int $id
+     * @param array $data
+     * @return object|null
+     */
+    public function updateProperty(int $id, array $data): ?object
+    {
+        $property = Property::find($id);
+
+        if (! $property) {
+            return null;
+        }
+
+        $images = $data['images'] ?? null;
+        unset($data['images']);
+
+        $property->update($data);
+
+        if ($images !== null) {
+            // Delete old images
+            $property->images()->delete();
+
+            if (! empty($images)) {
+                foreach ($images as $index => $uploadedFile) {
+                    // Generate unique filename
+                    $filename = time() . '_' . $index . '.' . $uploadedFile->getClientOriginalExtension();
+
+                    // Store file in storage/app/public/properties
+                    $path = $uploadedFile->storeAs('properties', $filename, 'public');
+
+                    // Create image record
+                    $property->images()->create([
+                        'image_path' => '/storage/' . $path,
+                        'image_name' => $uploadedFile->getClientOriginalName(),
+                        'is_primary' => ($index === 0), // First image is primary
+                        'sort_order' => ($index + 1),
+                    ]);
+                }
+            }
+        }
+
+        $property->load('images');
+
+        return $property;
+    }
+
+    /**
+     * Delete property and its images
+     * @param int $id
+     * @return bool
+     */
+    public function deleteProperty(int $id): bool
+    {
+        $property = Property::find($id);
+
+        if (! $property) {
+            return false;
+        }
+
+        // Delete associated images
+        $property->images()->delete();
+
+        return $property->delete();
+    }
 }

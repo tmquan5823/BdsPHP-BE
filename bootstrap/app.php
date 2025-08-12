@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(remove: [
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
         ]);
+
+        // Đăng ký custom API authentication middleware
+        $middleware->alias([
+            'api.auth' => \App\Http\Middleware\ApiAuthentication::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

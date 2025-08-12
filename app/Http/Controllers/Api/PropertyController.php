@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Validations\PropertyValidation;
 use App\Services\PropertyService;
 use Illuminate\Http\Request;
 
 class PropertyController extends Controller
 {
     protected $propertyService;
+    protected $propertyValidation;
 
-    public function __construct(PropertyService $propertyService)
+    public function __construct(PropertyService $propertyService, PropertyValidation $propertyValidation)
     {
         $this->propertyService = $propertyService;
+        $this->propertyValidation = $propertyValidation;
     }
 
     /**
@@ -53,6 +56,27 @@ class PropertyController extends Controller
             return $this->response('success', 'Lấy chi tiết bất động sản thành công', 200, $result);
         } catch (\Exception $e) {
             return $this->response('error', 'Không thể lấy chi tiết bất động sản', 500, ['message' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Create new property
+     */
+    public function createProperty(Request $request)
+    {
+        try {
+            $validator = $this->propertyValidation->validateCreateProperty($request);
+
+            if ($validator->fails()) {
+                return $this->response('error', 'Dữ liệu không hợp lệ', 422, ['errors' => $validator->errors()]);
+            }
+
+            $validated = $validator->validated();
+            $result = $this->propertyService->createProperty($validated);
+
+            return $this->response('success', 'Tạo bất động sản thành công', 201, $result);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Không thể tạo bất động sản', 500, ['message' => $e->getMessage()]);
         }
     }
 }

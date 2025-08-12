@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Validations\AuthValidation;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -89,7 +90,13 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try {
-            $result = $this->authService->logout($request->user());
+            $user = Auth::guard('sanctum')->user();
+
+            if (! $user) {
+                return $this->response('error', 'Token không hợp lệ hoặc đã hết hạn', 401);
+            }
+
+            $result = $this->authService->logout($user);
 
             return $this->response('success', 'Đăng xuất thành công', 200, $result);
         } catch (\Exception $e) {
@@ -103,10 +110,15 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         try {
+            $user = Auth::guard('sanctum')->user();
+            if (! $user) {
+                return $this->response('error', 'Token không hợp lệ hoặc đã hết hạn', 401);
+            }
+
             $userData = [
-                'id' => $request->user()->id,
-                'name' => $request->user()->name,
-                'email' => $request->user()->email,
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
             ];
 
             return $this->response('success', 'Lấy thông tin thành công', 200, ['user' => $userData]);

@@ -23,9 +23,15 @@ Route::post('/signin', [AuthController::class, 'signin']);
 // Property routes (public for testing)
 Route::get('/properties', [PropertyController::class, 'getPropertyList']);
 Route::get('/properties/{id}', [PropertyController::class, 'getPropertyDetail']);
+// Protected routes
+Route::middleware([\App\Http\Middleware\ApiAuthentication::class])->group(function () {
+    Route::post('/properties', [PropertyController::class, 'createProperty']);
+    Route::put('/properties/{id}', [PropertyController::class, 'updateProperty']);
+    Route::delete('/properties/{id}', [PropertyController::class, 'deleteProperty']);
+});
 
 // Protected routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware([\App\Http\Middleware\ApiAuthentication::class])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
@@ -36,6 +42,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/users/{id}', [AuthController::class, 'deleteUser']);
 });
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware([\App\Http\Middleware\ApiAuthentication::class])->get('/user', function (Request $request) {
     return $request->user();
 });
