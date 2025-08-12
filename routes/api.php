@@ -22,6 +22,7 @@ Route::post('/signin', [AuthController::class, 'signin']);
 
 // Property routes (public for testing)
 Route::get('/properties', [PropertyController::class, 'getPropertyList']);
+Route::get('/properties/{id}', [PropertyController::class, 'getPropertyDetail']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {

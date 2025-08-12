@@ -41,4 +41,18 @@ class PropertyController extends Controller
             return $this->response('error', 'Không thể lấy danh sách bất động sản', 500, ['message' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Get property detail
+     */
+    public function getPropertyDetail(Request $request, $id)
+    {
+        try {
+            $result = $this->propertyService->getPropertyDetail($id);
+
+            return $this->response('success', 'Lấy chi tiết bất động sản thành công', 200, $result);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Không thể lấy chi tiết bất động sản', 500, ['message' => $e->getMessage()]);
+        }
+    }
 }

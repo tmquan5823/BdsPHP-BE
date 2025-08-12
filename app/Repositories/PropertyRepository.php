@@ -101,4 +101,98 @@ class PropertyRepository extends BaseRepository
             ],
         ];
     }
+
+    /**
+     * Get property detail by ID with images
+     * @param int $id
+     * @return object|null
+     */
+    public function getPropertyDetail(int $id): ?object
+    {
+        $property = Property::with([
+            'images' => function ($query) {
+                $query->select('id', 'property_id', 'image_path', 'is_primary', 'sort_order')
+                    ->orderBy('is_primary', 'desc')
+                    ->orderBy('sort_order', 'asc');
+            },
+        ])
+            ->select(
+                'id',
+                'title',
+                'description',
+                'property_type',
+                'status',
+                'price',
+                'area',
+                'bedrooms',
+                'bathrooms',
+                'floors',
+                'address',
+                'city',
+                'district',
+                'postal_code',
+                'latitude',
+                'longitude',
+                'year_built',
+                'features',
+                'contact_name',
+                'contact_phone',
+                'contact_email',
+                'created_at',
+                'updated_at'
+            )
+            ->where('id', $id)
+            ->first();
+
+        if (! $property) {
+            return null;
+        }
+
+        // Format images
+        $formattedImages = [];
+        if ($property->images && $property->images->isNotEmpty()) {
+            $formattedImages = $property->images->map(function ($image) {
+                return [
+                    'id' => $image->id,
+                    'image_path' => $image->image_path,
+                    'is_primary' => (bool) $image->is_primary,
+                    'sort_order' => $image->sort_order,
+                ];
+            })->toArray();
+        }
+
+        // Format property data
+        $formattedProperty = [
+            'id' => $property->id,
+            'title' => $property->title,
+            'description' => $property->description,
+            'property_type' => $property->property_type,
+            'status' => $property->status,
+            'price' => (int) $property->price,
+            'area' => (float) $property->area,
+            'bedrooms' => $property->bedrooms,
+            'bathrooms' => $property->bathrooms,
+            'floors' => $property->floors,
+            'address' => $property->address,
+            'city' => $property->city,
+            'district' => $property->district,
+            'postal_code' => $property->postal_code,
+            'location' => [
+                'latitude' => (float) $property->latitude,
+                'longitude' => (float) $property->longitude,
+            ],
+            'year_built' => $property->year_built,
+            'features' => $property->features,
+            'contact' => [
+                'name' => $property->contact_name,
+                'phone' => $property->contact_phone,
+                'email' => $property->contact_email,
+            ],
+            'images' => $formattedImages,
+            'created_at' => $property->created_at,
+            'updated_at' => $property->updated_at,
+        ];
+
+        return (object) $formattedProperty;
+    }
 }

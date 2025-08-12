@@ -78,16 +78,6 @@ composer dev
 npm run build
 ```
 
-## 🧪 Testing
-
-```bash
-# Chạy tests
-composer test
-
-# Hoặc
-php artisan test
-```
-
 ## 🎨 Code Style (PSR-12)
 
 ### Kiểm tra code style
@@ -124,7 +114,8 @@ GET    /api/me             - Thông tin user (cần auth)
 ### Properties (Bất động sản)
 
 ```
-GET    /api/properties     - Danh sách bất động sản
+GET    /api/properties      - Danh sách bất động sản
+GET    /api/properties/{id} - Chi tiết bất động sản
 ```
 
 ### User Management (cần auth)
