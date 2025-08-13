@@ -103,4 +103,23 @@ class PropertyService
             throw new \Exception('Không thể cập nhật bất động sản: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Delete property by ID
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function deleteProperty(int $id): bool
+    {
+        try {
+            $result = $this->propertyRepository->deleteProperty($id);
+
+            return $result;
+        } catch (\Exception $e) {
+            \Log::error('Property deletion error: ' . $e->getMessage());
+
+            throw new \Exception('Không thể xóa bất động sản: ' . $e->getMessage());
+        }
+    }
 }

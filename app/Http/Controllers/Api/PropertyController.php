@@ -104,4 +104,22 @@ class PropertyController extends Controller
             return $this->response('error', 'Không thể cập nhật bất động sản', 500, ['message' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Delete property
+     */
+    public function deleteProperty(Request $request, $id)
+    {
+        try {
+            $result = $this->propertyService->deleteProperty($id);
+
+            if (! $result) {
+                return $this->response('error', 'Không tìm thấy bất động sản', 404);
+            }
+
+            return $this->response('success', 'Xóa bất động sản thành công', 200);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Không thể xóa bất động sản', 500, ['message' => $e->getMessage()]);
+        }
+    }
 }
