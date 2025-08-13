@@ -23,19 +23,19 @@ Route::post('/signin', [AuthController::class, 'signin']);
 // Property routes (public for testing)
 Route::get('/properties', [PropertyController::class, 'getPropertyList']);
 Route::get('/properties/{id}', [PropertyController::class, 'getPropertyDetail']);
-// Protected routes
-Route::middleware([\App\Http\Middleware\ApiAuthentication::class])->group(function () {
-    Route::post('/properties', [PropertyController::class, 'createProperty']);
-    Route::put('/properties/{id}', [PropertyController::class, 'updateProperty']);
-    Route::delete('/properties/{id}', [PropertyController::class, 'deleteProperty']);
-});
 
 // Protected routes
 Route::middleware([\App\Http\Middleware\ApiAuthentication::class])->group(function () {
+    // Property management
+    Route::post('/properties', [PropertyController::class, 'createProperty']);
+    Route::post('/properties/{id}', [PropertyController::class, 'updateProperty']);
+    Route::delete('/properties/{id}', [PropertyController::class, 'deleteProperty']);
+
+    // Auth management
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
-    // User management routes
+    // User management
     Route::get('/users', [AuthController::class, 'getUserList']);
     Route::get('/users/{id}', [AuthController::class, 'getUserDetail']);
     Route::put('/users/{id}', [AuthController::class, 'updateUser']);

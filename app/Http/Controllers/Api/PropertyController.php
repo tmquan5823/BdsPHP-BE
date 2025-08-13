@@ -79,4 +79,29 @@ class PropertyController extends Controller
             return $this->response('error', 'Không thể tạo bất động sản', 500, ['message' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Update property
+     */
+    public function updateProperty(Request $request, $id)
+    {
+        try {
+            $validator = $this->propertyValidation->validateUpdateProperty($request);
+
+            if ($validator->fails()) {
+                return $this->response('error', 'Dữ liệu không hợp lệ', 422, ['errors' => $validator->errors()]);
+            }
+
+            $validated = $validator->validated();
+            $result = $this->propertyService->updateProperty($id, $validated);
+
+            if (! $result) {
+                return $this->response('error', 'Không tìm thấy bất động sản', 404);
+            }
+
+            return $this->response('success', 'Cập nhật bất động sản thành công', 200, $result);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Không thể cập nhật bất động sản', 500, ['message' => $e->getMessage()]);
+        }
+    }
 }

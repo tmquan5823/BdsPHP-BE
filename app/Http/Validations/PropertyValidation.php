@@ -112,7 +112,7 @@ class PropertyValidation
     }
 
     /**
-     * Validate property update data with file uploads
+     * Validate property update data (without images)
      *
      * @param Request $request
      * @return \Illuminate\Contracts\Validation\Validator
@@ -165,13 +165,6 @@ class PropertyValidation
                 'string',
                 'max:20',
             ],
-            'images.*' => [
-                'nullable',
-                'file',
-                'image',
-                'mimes:jpeg,png,jpg,gif,webp',
-                'max:5120', // 5MB
-            ],
         ], [
             'title.string' => 'Tiêu đề phải là chuỗi',
             'title.max' => 'Tiêu đề không được vượt quá 255 ký tự',
@@ -191,10 +184,6 @@ class PropertyValidation
             'contact_name.max' => 'Tên liên hệ không được vượt quá 100 ký tự',
             'contact_phone.string' => 'Số điện thoại phải là chuỗi',
             'contact_phone.max' => 'Số điện thoại không được vượt quá 20 ký tự',
-            'images.*.file' => 'File phải là file hợp lệ',
-            'images.*.image' => 'File phải là hình ảnh',
-            'images.*.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif, webp',
-            'images.*.max' => 'Kích thước hình ảnh không được vượt quá 5MB',
         ]);
     }
 }

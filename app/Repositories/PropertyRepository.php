@@ -232,7 +232,7 @@ class PropertyRepository extends BaseRepository
     }
 
     /**
-     * Update property with images
+     * Update property (without images)
      * @param int $id
      * @param array $data
      * @return object|null
@@ -245,34 +245,13 @@ class PropertyRepository extends BaseRepository
             return null;
         }
 
-        $images = $data['images'] ?? null;
+        // Remove images from data if present
         unset($data['images']);
 
+        // Update property data
         $property->update($data);
 
-        if ($images !== null) {
-            // Delete old images
-            $property->images()->delete();
-
-            if (! empty($images)) {
-                foreach ($images as $index => $uploadedFile) {
-                    // Generate unique filename
-                    $filename = time() . '_' . $index . '.' . $uploadedFile->getClientOriginalExtension();
-
-                    // Store file in storage/app/public/properties
-                    $path = $uploadedFile->storeAs('properties', $filename, 'public');
-
-                    // Create image record
-                    $property->images()->create([
-                        'image_path' => '/storage/' . $path,
-                        'image_name' => $uploadedFile->getClientOriginalName(),
-                        'is_primary' => ($index === 0), // First image is primary
-                        'sort_order' => ($index + 1),
-                    ]);
-                }
-            }
-        }
-
+        // Load images relationship
         $property->load('images');
 
         return $property;

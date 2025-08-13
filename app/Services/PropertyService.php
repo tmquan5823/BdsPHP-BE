@@ -81,4 +81,26 @@ class PropertyService
             throw new \Exception('Không thể tạo bất động sản: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Update property by ID
+     *
+     * @param int $id
+     * @param array $data
+     * @return object|null
+     */
+    public function updateProperty(int $id, array $data): ?object
+    {
+        try {
+            // Update property via repository
+            $result = $this->propertyRepository->updateProperty($id, $data);
+
+            return $result;
+        } catch (\Exception $e) {
+            // Log error for debugging
+            \Log::error('Property update error: ' . $e->getMessage());
+
+            throw new \Exception('Không thể cập nhật bất động sản: ' . $e->getMessage());
+        }
+    }
 }
