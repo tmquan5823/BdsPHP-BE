@@ -147,4 +147,22 @@ class PropertyController extends Controller
             return $this->response('error', 'Không thể upload ảnh', 500, ['message' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Delete specific image from property
+     */
+    public function deleteImage(Request $request, $propertyId, $imageId)
+    {
+        try {
+            $result = $this->propertyService->deleteImage($propertyId, $imageId);
+
+            if (! $result) {
+                return $this->response('error', 'Không tìm thấy bất động sản hoặc ảnh', 404);
+            }
+
+            return $this->response('success', 'Xóa ảnh thành công', 200);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Không thể xóa ảnh', 500, ['message' => $e->getMessage()]);
+        }
+    }
 }

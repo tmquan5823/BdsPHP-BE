@@ -144,4 +144,24 @@ class PropertyService
             throw new \Exception('Không thể upload ảnh cho bất động sản: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Delete specific image from property
+     *
+     * @param int $propertyId
+     * @param int $imageId
+     * @return bool
+     */
+    public function deleteImage(int $propertyId, int $imageId): bool
+    {
+        try {
+            $result = $this->propertyRepository->deleteImage($propertyId, $imageId);
+
+            return $result;
+        } catch (\Exception $e) {
+            \Log::error('Lỗi khi xóa ảnh: ' . $e->getMessage());
+
+            throw new \Exception('Không thể xóa ảnh: ' . $e->getMessage());
+        }
+    }
 }

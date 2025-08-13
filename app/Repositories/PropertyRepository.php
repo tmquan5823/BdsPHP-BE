@@ -316,4 +316,46 @@ class PropertyRepository extends BaseRepository
 
         return $property;
     }
+
+    /**
+     * Delete specific image from property
+     * @param int $propertyId
+     * @param int $imageId
+     * @return bool
+     */
+    public function deleteImage(int $propertyId, int $imageId): bool
+    {
+        $property = Property::find($propertyId);
+
+        if (! $property) {
+            return false;
+        }
+
+        $image = $property->images()->where('id', $imageId)->first();
+
+        if (! $image) {
+            return false;
+        }
+
+        $imagePath = str_replace('/storage/', '', $image->image_path);
+        if (\Storage::disk('public')->exists($imagePath)) {
+            \Storage::disk('public')->delete($imagePath);
+        }
+
+        $image->delete();
+
+        if ($image->is_primary) {
+            $firstImage = $property->images()->orderBy('sort_order', 'asc')->first();
+            if ($firstImage) {
+                $firstImage->update(['is_primary' => true]);
+            }
+        }
+
+        $remainingImages = $property->images()->orderBy('sort_order', 'asc')->get();
+        foreach ($remainingImages as $index => $remainingImage) {
+            $remainingImage->update(['sort_order' => $index + 1]);
+        }
+
+        return true;
+    }
 }

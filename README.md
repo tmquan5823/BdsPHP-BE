@@ -114,8 +114,13 @@ GET    /api/me             - Thông tin user (cần auth)
 ### Properties (Bất động sản)
 
 ```
-GET    /api/properties      - Danh sách bất động sản
-GET    /api/properties/{id} - Chi tiết bất động sản
+GET    /api/properties                    - Danh sách bất động sản
+GET    /api/properties/{id}              - Chi tiết bất động sản
+POST   /api/properties                    - Tạo bất động sản mới (cần auth)
+PUT    /api/properties/{id}               - Cập nhật bất động sản (cần auth)
+DELETE /api/properties/{id}               - Xóa bất động sản (cần auth)
+POST   /api/properties/{id}/images       - Upload thêm ảnh (cần auth)
+DELETE /api/properties/{id}/images/{image_id} - Xóa ảnh cụ thể (cần auth)
 ```
 
 ### User Management (cần auth)
@@ -125,6 +130,13 @@ GET    /api/users          - Danh sách users
 GET    /api/users/{id}     - Chi tiết user
 PUT    /api/users/{id}     - Cập nhật user
 DELETE /api/users/{id}     - Xóa user
+```
+
+### Image Management (cần auth)
+
+```
+POST   /api/properties/{id}/images       - Upload thêm ảnh cho bất động sản
+DELETE /api/properties/{id}/images/{image_id} - Xóa ảnh cụ thể của bất động sản
 ```
 
 ## 🔍 API Properties - Filter & Pagination
@@ -146,6 +158,14 @@ GET /api/properties?property_type=apartment&status=available&city=Hồ Chí Minh
 
 # Lấy nhà riêng giá từ 1-5 tỷ
 GET /api/properties?property_type=house&min_price=1000000000&max_price=5000000000
+
+# Upload thêm ảnh cho bất động sản
+POST /api/properties/1/images
+Content-Type: multipart/form-data
+Body: images[]=file1.jpg&images[]=file2.jpg
+
+# Xóa ảnh cụ thể
+DELETE /api/properties/1/images/5
 ```
 
 ### Response format
