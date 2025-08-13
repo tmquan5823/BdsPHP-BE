@@ -275,4 +275,45 @@ class PropertyRepository extends BaseRepository
 
         return $property->delete();
     }
+
+    /**
+     * Upload additional images for property
+     * @param int $id
+     * @param array $images
+     * @return object|null
+     */
+    public function uploadImages(int $id, array $images): ?object
+    {
+        $property = Property::find($id);
+
+        if (! $property) {
+            return null;
+        }
+
+        if (! empty($images)) {
+            // Get current max sort order
+            $maxSortOrder = $property->images()->max('sort_order') ?? 0;
+
+            foreach ($images as $index => $uploadedFile) {
+                // Generate unique filename
+                $filename = time() . '_' . ($maxSortOrder + $index + 1) . '.' . $uploadedFile->getClientOriginalExtension();
+
+                // Store file in storage/app/public/properties
+                $path = $uploadedFile->storeAs('properties', $filename, 'public');
+
+                // Create image record
+                $property->images()->create([
+                    'image_path' => '/storage/' . $path,
+                    'image_name' => $uploadedFile->getClientOriginalName(),
+                    'is_primary' => false, // New images are not primary
+                    'sort_order' => $maxSortOrder + $index + 1,
+                ]);
+            }
+        }
+
+        // Load images relationship
+        $property->load('images');
+
+        return $property;
+    }
 }

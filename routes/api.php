@@ -30,6 +30,7 @@ Route::middleware([\App\Http\Middleware\ApiAuthentication::class])->group(functi
     Route::post('/properties', [PropertyController::class, 'createProperty']);
     Route::post('/properties/{id}', [PropertyController::class, 'updateProperty']);
     Route::delete('/properties/{id}', [PropertyController::class, 'deleteProperty']);
+    Route::post('/properties/{id}/images', [PropertyController::class, 'uploadImages']);
 
     // Auth management
     Route::post('/logout', [AuthController::class, 'logout']);

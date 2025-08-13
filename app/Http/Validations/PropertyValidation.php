@@ -186,4 +186,37 @@ class PropertyValidation
             'contact_phone.max' => 'Số điện thoại không được vượt quá 20 ký tự',
         ]);
     }
+
+    /**
+     * Validate property image upload
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validateUploadImages(Request $request)
+    {
+        return Validator::make($request->all(), [
+            'images' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+            'images.*' => [
+                'required',
+                'file',
+                'image',
+                'mimes:jpeg,png,jpg,gif,webp',
+                'max:5120', // 5MB
+            ],
+        ], [
+            'images.required' => 'Ảnh là bắt buộc',
+            'images.array' => 'Ảnh phải là mảng',
+            'images.min' => 'Phải có ít nhất 1 ảnh',
+            'images.*.required' => 'Mỗi ảnh là bắt buộc',
+            'images.*.file' => 'File phải là file hợp lệ',
+            'images.*.image' => 'File phải là hình ảnh',
+            'images.*.mimes' => 'Hình ảnh phải có định dạng: jpeg, png, jpg, gif, webp',
+            'images.*.max' => 'Kích thước hình ảnh không được vượt quá 5MB',
+        ]);
+    }
 }

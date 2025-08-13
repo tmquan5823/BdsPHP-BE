@@ -122,4 +122,29 @@ class PropertyController extends Controller
             return $this->response('error', 'Không thể xóa bất động sản', 500, ['message' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Upload additional images for property
+     */
+    public function uploadImages(Request $request, $id)
+    {
+        try {
+            $validator = $this->propertyValidation->validateUploadImages($request);
+
+            if ($validator->fails()) {
+                return $this->response('error', 'Dữ liệu không hợp lệ', 422, ['errors' => $validator->errors()]);
+            }
+
+            $validated = $validator->validated();
+            $result = $this->propertyService->uploadImages($id, $validated['images']);
+
+            if (! $result) {
+                return $this->response('error', 'Không tìm thấy bất động sản', 404);
+            }
+
+            return $this->response('success', 'Tải ảnh thành công', 200, $result);
+        } catch (\Exception $e) {
+            return $this->response('error', 'Không thể upload ảnh', 500, ['message' => $e->getMessage()]);
+        }
+    }
 }

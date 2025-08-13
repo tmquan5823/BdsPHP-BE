@@ -122,4 +122,26 @@ class PropertyService
             throw new \Exception('Không thể xóa bất động sản: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Upload additional images for property
+     *
+     * @param int $id
+     * @param array $images
+     * @return object|null
+     */
+    public function uploadImages(int $id, array $images): ?object
+    {
+        try {
+            // Upload images via repository
+            $result = $this->propertyRepository->uploadImages($id, $images);
+
+            return $result;
+        } catch (\Exception $e) {
+            // Log error for debugging
+            \Log::error('Lỗi khi tải ảnh: ' . $e->getMessage());
+
+            throw new \Exception('Không thể upload ảnh cho bất động sản: ' . $e->getMessage());
+        }
+    }
 }
