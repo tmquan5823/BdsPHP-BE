@@ -46,6 +46,8 @@ class Property extends Model
         'bathrooms' => 'integer',
         'floors' => 'integer',
         'year_built' => 'integer',
+        'status' => 'string',
+        'property_type' => 'string',
     ];
 
     protected $hidden = [

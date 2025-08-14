@@ -72,7 +72,20 @@ class PropertyController extends Controller
             }
 
             $validated = $validator->validated();
-            $result = $this->propertyService->createProperty($validated);
+            $data = array_merge($request->only([
+                'description',
+                'property_type',
+                'bedrooms',
+                'bathrooms',
+                'floors',
+                'postal_code',
+                'latitude',
+                'longitude',
+                'year_built',
+                'features',
+                'contact_email',
+            ]), $validated);
+            $result = $this->propertyService->createProperty($data);
 
             return $this->response('success', 'Tạo bất động sản thành công', 201, $result);
         } catch (\Exception $e) {
@@ -93,7 +106,20 @@ class PropertyController extends Controller
             }
 
             $validated = $validator->validated();
-            $result = $this->propertyService->updateProperty($id, $validated);
+            $data = array_merge($request->only([
+                'description',
+                'property_type',
+                'bedrooms',
+                'bathrooms',
+                'floors',
+                'postal_code',
+                'latitude',
+                'longitude',
+                'year_built',
+                'features',
+                'contact_email',
+            ]), $validated);
+            $result = $this->propertyService->updateProperty($id, $data);
 
             if (! $result) {
                 return $this->response('error', 'Không tìm thấy bất động sản', 404);

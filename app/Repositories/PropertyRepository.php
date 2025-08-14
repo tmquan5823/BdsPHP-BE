@@ -204,9 +204,15 @@ class PropertyRepository extends BaseRepository
     public function createProperty(array $data): object
     {
         $images = $data['images'] ?? [];
-        unset($data['images']);
 
-        $property = Property::create($data);
+        $propertyData = $data;
+        unset($propertyData['images']);
+
+        $propertyData = array_filter($propertyData, function ($value) {
+            return $value !== null && $value !== '';
+        });
+
+        $property = Property::create($propertyData);
 
         if (! empty($images)) {
             foreach ($images as $index => $uploadedFile) {
@@ -245,13 +251,12 @@ class PropertyRepository extends BaseRepository
             return null;
         }
 
-        // Remove images from data if present
-        unset($data['images']);
+        $propertyData = array_filter($data, function ($value) {
+            return $value !== null && $value !== '';
+        });
 
-        // Update property data
-        $property->update($data);
+        $property->update($propertyData);
 
-        // Load images relationship
         $property->load('images');
 
         return $property;
